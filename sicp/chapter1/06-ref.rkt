@@ -2,13 +2,14 @@
 
 ; refactoring of sqrt function with incapsulation of locally-defined functions
 
+(define (square x) (* x x))
+
+(define (abs x) (if (< x 0) (- x) x))
+
+(define (average x y) (/ (+ x y) 2))
+
+
 (define (sqrt x)
-
-  (define (square x) (* x x))
-
-  (define (abs x) (if (< x 0) (- x) x))
-
-  (define (average x y) (/ (+ x y) 2))
 
   (define (improve guess)
     (average guess (/ x guess)))
