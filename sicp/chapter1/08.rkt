@@ -22,7 +22,7 @@
     (/ (+ (/ x (square guess)) (* 2 guess)) 3))
 
   (define (good-enought? guess)
-    (< (abs (- (cube guess) x)) 0.001))
+    (< (abs (- (cube guess) x)) 0.0001))
 
   (define (cube-iter guess)
     (if (good-enought? guess)
