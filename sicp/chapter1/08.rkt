@@ -1,6 +1,11 @@
 #lang sicp
 
-; refactoring of sqrt function with incapsulation of locally-defined functions
+
+; TASK:
+; Make procedure for cube root extraction:
+
+
+; SOLUTION:
 
 (define (square x) (* x x))
 
