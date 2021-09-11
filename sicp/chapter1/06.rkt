@@ -22,17 +22,21 @@
       guess
       (sqrt-iter (improve guess x) x))) #| recursion! |#
 
+(define (sqrt x) (sqrt-iter 1.0 x))
+
 
 ; SOLUTION:
-
-(define (new-sqrt-iter guess x)
-  (new-if (good-enought? guess x)
-      guess
-      (sqrt-iter (improve guess x) x))) #| recursion! |#
 
 (define (new-if predicate then-clause else-clause)
   (cond (predicate then-clause)
         (else else-clause)))
+
+(define (new-sqrt-iter guess x)
+  (new-if (good-enought? guess x)
+          guess
+          (sqrt-iter (improve guess x) x))) #| recursion! |#
+
+(define (new-sqrt x) (new-sqrt-iter 1.0 x))
 
 ; Не сможет, т.к. в отличие от cond if не пытается развернуть альтернативную
 ; операцию до тех пор, пока проверка предиката не провалилась. Соответственно
