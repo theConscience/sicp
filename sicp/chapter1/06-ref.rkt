@@ -10,15 +10,15 @@
 
   (define (average x y) (/ (+ x y) 2))
 
-  (define (improve guess x)
+  (define (improve guess)
     (average guess (/ x guess)))
 
-  (define (good-enought? guess x)
+  (define (good-enought? guess)
     (< (abs (- (square guess) x)) 0.001))
 
-  (define (sqrt-iter guess x)
-    (if (good-enought? guess x)
+  (define (sqrt-iter guess)
+    (if (good-enought? guess)
         guess
-        (sqrt-iter (improve guess x) x))) #| recursion! |#
+        (sqrt-iter (improve guess)))) #| recursion! |#
 
-  (sqrt-iter 1.0 x))
+  (sqrt-iter 1.0))
