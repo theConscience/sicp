@@ -105,7 +105,8 @@
 
 (define (exp x y)
   (cond
-    ((= y 0))
+    ((< y 0) (/ 1 (exp x (- y))))
+    ((= y 0) 1)
     ((> y 2) (* x (exp x (- y 1))))
     ((= y 2) (* x x))
     (else x)))
