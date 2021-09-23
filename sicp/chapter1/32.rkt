@@ -57,3 +57,5 @@
 (check-equal? (accumulate * 1 square 1 inc 3) 36)
 (check-equal? (accumulate * 1 identity 3 inc 5) 60)
 (check-equal? (accumulate + 0 identity 1 inc 10) 55)
+(check-equal? (sum 1 4) 10)
+(check-equal? (prod 1 4) 24)
