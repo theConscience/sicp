@@ -19,14 +19,14 @@
 
 (define (car z)
   (define (car-iter n counter)
-    (if (and (> n 2) (divides? n 2))
+    (if (and (>= n 2) (divides? n 2))
       (car-iter (/ n 2) (+ counter 1))
       counter))
   (car-iter z 0))
 
 (define (cdr z)
   (define (cdr-iter n counter)
-    (if (and (> n 3) (divides? n 3))
+    (if (and (>= n 3) (divides? n 3))
       (cdr-iter (/ n 3) (+ counter 1))
       counter))
   (cdr-iter z 0))
@@ -50,12 +50,16 @@
 (define (divides? a b)
   (= (remainder a b) 0))
 
+(define (>= a b) (not (< a b)))
+
 
 ; TESTS:
 
 (define x (cons 2 3))
 (define y (cons 1 5))
 (define z (cons 11 21))
+(define a (cons 1 1))
+(define b (cons 0 0))
 
 (check-equal? (car x) 2)
 (check-equal? (cdr x) 3)
@@ -63,3 +67,7 @@
 (check-equal? (cdr y) 5)
 (check-equal? (car z) 11)
 (check-equal? (cdr z) 21)
+(check-equal? (car a) 1)
+(check-equal? (cdr a) 1)
+(check-equal? (car b) 0)
+(check-equal? (cdr b) 0)
