@@ -4,70 +4,172 @@
 
 ; TASK:
 ;
-; Представление пар с помощью чисел и арифметических операций
+; Упражнение 2.6.
 ;
-; Покажите, что можно представлять пары неотрицательных целых чисел, используя
-; только числа и арифметические операции, если представлять пару a и b как
-; произведение 2^a * 3^b .
-; Дайте соответствующие определения процедур cons , car и cdr .
+; Если представление пар как процедур было для Вас еще недостаточно
+; сумасшедшим, то заметьте,
+; что в языке, который способен манипулировать процедурами, мы можем обойтись
+; и без чисел (по
+; крайней мере, пока речь идет о неотрицательных числах), определив
+; 0 и операцию прибавления 1
+; так:
+
+(define zero
+  (lambda (f) (lambda (x) x)))
+
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+; Такое представление известно как числа Чёрча (Church numerals), по имени его
+; изобретателя, Алонсо Чёрча, того самого логика, который придумал λ-исчисление.
+; Определите one (единицу) и two (двойку) напрямую (не через zero и add-1).
+; (Подсказка: вычислите (add-1 zero) с помощью подстановки.)
+; Дайте прямое определение процедуры сложения + (не в терминах повторяющегося применения add-1).
 
 
 ; SOLUTION:
 
-(define (cons x y)
-  (* (exp 2 x) (exp 3 y)))
+(add-1 zero)
+;
+; ; Вычисляем с помощью подстановки:
+;
+; (lambda (f)
+;   (lambda (x) (f ((zero f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (((lambda (f) (lambda (y) y)) f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f ((lambda (y) y) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f x)))
 
-(define (car z)
-  (define (car-iter n counter)
-    (if (and (>= n 2) (divides? n 2))
-      (car-iter (/ n 2) (+ counter 1))
-      counter))
-  (car-iter z 0))
 
-(define (cdr z)
-  (define (cdr-iter n counter)
-    (if (and (>= n 3) (divides? n 3))
-      (cdr-iter (/ n 3) (+ counter 1))
-      counter))
-  (cdr-iter z 0))
+; One:
 
-#| (define (cdr z) |#
-#|   (z (lambda (p q) q))) |#
+(define one (lambda (f) (lambda (x) (f x))))
+
+(add-1 one)
+
+; (lambda (f)
+;   (lambda (x) (f ((one f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (((lambda (f2) (lambda (y) (f2 y))) f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f ((lambda (y) (f y)) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (f x))))
+
+
+; Two:
+
+(define two (lambda (f) (lambda (x) (f (f x)))))
+
+(add-1 two)
+
+; (lambda (f)
+;   (lambda (x) (f ((two f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (((lambda (f2) (lambda (y) (f2 (f2 y)))) f) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (((lambda (y) (f (f y))) x))))
+;
+; (lambda (f)
+;   (lambda (x) (f (f (f x))))
+
+
+; Addition:
+
+(define (add n m)
+  (lambda (f) (lambda (x) ((n f) ((m f) x)))))
+
+(add one two)
+
+; (lambda (f) (lambda (x) ((one f) ((two f) x))))
+
+; (lambda (f) (lambda (x)
+;   (((lambda (n) (lambda (y) (n y))) f)
+;   ((two f) x))))
+
+; (lambda (f) (lambda (x)
+;   (((lambda (n) (lambda (y) (n y))) f)
+;   (((lambda (m) (lambda (z) (m (m z)))) f) x))))
+
+; (lambda (f) (lambda (x)
+;   ((lambda (y) (f y))
+;   ((lambda (z) (f (f z))) x))))
+
+; (lambda (f) (lambda (x)
+;   ((lambda (y) (f y))
+;   (f (f x)))))
+
+; (lambda (f) (lambda (x)
+;   ((lambda (y) (f y)) (f (f x)))))
+
+; (lambda (f) (lambda (x)
+;   (f (f (f x)))))
+
+; (lambda (f) (lambda (x) (f (f (f x)))))
+
+
+; Multiplication:
+
+; (define mul (lambda (f g) (f g)))
+
+; (lambda (one two) (one two))
+;
+; (lambda (f) (lambda (x) (f x))) two)
+;
+; (lambda (f) (lambda (x) (f x))) (lambda (f2) (lambda (y) (f2 (f2 y)))))
+;
+; (lambda (x) ((lambda (f2) (lambda (y) (f2 (f2 y)))) x))
+;
+; (lambda (x) (lambda (y) (x (x y))))
+
+; (define mul (lambda (f g) (lambda (x) (f (g x)))))
+
+; (lambda (one two) (lambda (x) (one (two x))))
+;
+; (lambda (x) ((lambda (f) (lambda (y) (f y))) (two x)))
+;
+; (lambda (x) ((lambda (f) (lambda (y) (f y))) ((lambda (g) (lambda (z) (g (g z)))) x)))
+;
+; (lambda (x) ((lambda (f) (lambda (y) (f y))) (lambda (z) (x (x z)))))
+;
+; (lambda (x) (lambda (y) ((lambda (z) (x (x z))) y)))
+;
+; (lambda (x) (lambda (y) (x (x y))))
+
+(define (mul n m)
+  (lambda (f) (lambda (x) ((n (m f)) x))))
+
+(mul one two)
 
 
 ; HELPERS:
 
-(define (exp base degree)
-  (define (exp-iter b n a)
-    (cond
-      ((< n 0) (/ 1 (exp-iter b (- n) a)))
-      ((= n 0) (if (= a 1) 1 a))
-      ((even? n) (exp-iter (* b b) (/ n 2) a))
-      (else (exp-iter b (- n 1) (* a b)))))
+(define (church->nat n) ((n inc) 0))
 
-  (exp-iter base degree 1))
-
-(define (divides? a b)
-  (= (remainder a b) 0))
-
-(define (>= a b) (not (< a b)))
+(define (inc x) (+ x 1))
 
 
 ; TESTS:
 
-(define x (cons 2 3))
-(define y (cons 1 5))
-(define z (cons 11 21))
-(define a (cons 1 1))
-(define b (cons 0 0))
-
-(check-equal? (car x) 2)
-(check-equal? (cdr x) 3)
-(check-equal? (car y) 1)
-(check-equal? (cdr y) 5)
-(check-equal? (car z) 11)
-(check-equal? (cdr z) 21)
-(check-equal? (car a) 1)
-(check-equal? (cdr a) 1)
-(check-equal? (car b) 0)
-(check-equal? (cdr b) 0)
+(check-equal? (church->nat zero) 0)
+(check-equal? (church->nat one) 1)
+(check-equal? (church->nat two) 2)
+(check-equal? (church->nat (add one one)) 2)
+(check-equal? (church->nat (add two one)) 3)
+(check-equal? (church->nat (add (add two one) zero)) 3)
+(check-equal? (church->nat (add (add two one) one)) 4)
+(check-equal? (church->nat (mul one one)) 1)
+(check-equal? (church->nat (mul two one)) 2)
+(check-equal? (church->nat (mul (mul two one) zero)) 0)
+(check-equal? (church->nat (mul (mul two one) one)) 2)
+(check-equal? (church->nat (mul (mul two two) two)) 8)
